@@ -61,6 +61,7 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:5.2.5") {
         exclude("org.apache.xmlbeans", "xmlbeans")
     }
+    implementation("org.apache.poi:poi-scratchpad:5.2.5")
 
     // HTML parsing (Jsoup)
     implementation("org.jsoup:jsoup:1.17.2")
