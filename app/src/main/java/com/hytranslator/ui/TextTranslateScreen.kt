@@ -2,7 +2,6 @@ package com.hytranslator.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,7 +62,7 @@ fun TextTranslateScreen(
             is UiState.Loading -> LinearProgressIndicator(Modifier.fillMaxWidth())
             is UiState.Success -> Card(colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer)) {
                 Column(Modifier.padding(12.dp)) {
-                    SelectionContainer { Text(s.result.translated) }
+                    Text(s.result.translated)
                 }
             }
             is UiState.Error -> Card(colors = CardDefaults.cardColors(MaterialTheme.colorScheme.errorContainer)) {
@@ -80,8 +79,12 @@ fun LanguageDropdown(label: String, selected: Language, onSelect: (Language) -> 
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded, { expanded = it }, modifier) {
         OutlinedTextField(
-            selected.displayName + " (" + selected.code + ")", {}, true, { Text(label) },
-            { ExposedDropdownMenuDefaults.TrailingIcon(expanded) }, Modifier.menuAnchor(),
+            value = selected.displayName + " (" + selected.code + ")",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            modifier = Modifier.menuAnchor(),
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors())
         ExposedDropdownMenu(expanded, { expanded = false }) {
             Language.entries.forEach { lang ->
