@@ -3,13 +3,13 @@ package com.hytranslator
 import android.app.Application
 
 class HyTranslatorApp : Application() {
-    lateinit var engine: translator.HyMTEngine
+    lateinit var engine: com.hytranslator.translator.HyMTEngine
         private set
 
     override fun onCreate() {
         super.onCreate()
         instance = this
-        engine = translator.HyMTEngine(this)
+        engine = com.hytranslator.translator.HyMTEngine(this)
     }
 
     companion object {
