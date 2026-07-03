@@ -26,8 +26,8 @@ class HyMTEngine(private val context: Context) {
     companion object {
         private const val TAG = "HyMTEngine"
         private const val MODEL_DIR = "models/hy-mt"
-        private const val MODEL_FILE = "hy-mt-1.5-1.8b-Q4_K_M.gguf"
-        private const val MS_URL = "https://modelscope.cn/api/v1/models/AngelSlim/Hy-MT1.5-1.8B-1.25bit-GGUF/repo?FilePath="
+        private const val MODEL_FILE = "Hy-MT1.5-1.8B-STQ1_0.gguf"
+        private const val MS_URL = "https://modelscope.cn/models/AngelSlim/Hy-MT1.5-1.8B-1.25bit-GGUF/resolve/master/"
         private const val HF_URL = "https://huggingface.co/AngelSlim/Hy-MT1.5-1.8B-1.25bit-GGUF/resolve/main/"
     }
 
