@@ -119,7 +119,7 @@ fun MainScreen() {
                     state = fileState,
                     onStateChange = { fileState = it },
                     modelReady = modelReady,
-                    context = this@MainScreen::class.java.enclosingClass?.`package`?.name ?: this@MainScreen.javaClass.`package`?.name ?: "com.hytranslator",
+                    context = "com.hytranslator",
                     translate = { text, src, tgt ->
                         app.engine.translate(text, src, tgt)
                     }
