@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">混元翻译</string>
+    <string name="tab_text">文本翻译</string>
+    <string name="tab_file">文件翻译</string>
+    <string name="tab_web">网页翻译</string>
+    <string name="btn_translate">翻译</string>
+    <string name="btn_select_file">选择文件</string>
+    <string name="btn_select_folder">选择网页文件夹</string>
+    <string name="label_source_lang">源语言</string>
+    <string name="label_target_lang">目标语言</string>
+    <string name="model_loading">模型加载中…</string>
+    <string name="translating">翻译中…</string>
+    <string name="done">完成</string>
+</resources>
