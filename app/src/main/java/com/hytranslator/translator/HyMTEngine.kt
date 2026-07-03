@@ -2,12 +2,12 @@ package com.hytranslator.translator
 
 import android.content.Context
 import android.util.Log
-import com.ggerganov.llama.LlamaModel
-import com.ggerganov.llama.LlamaParams
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.codeshipping.llamakotlin.LlamaModel
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
@@ -27,7 +27,6 @@ class HyMTEngine(private val context: Context) {
         private const val TAG = "HyMTEngine"
         private const val MODEL_DIR = "models/hy-mt"
         private const val MODEL_FILE = "hy-mt-1.5-1.8b-Q4_K_M.gguf"
-        private const val TOKENIZER_FILE = "tokenizer.json"
         private const val MS_URL = "https://modelscope.cn/api/v1/models/AngelSlim/Hy-MT1.5-1.8B-1.25bit-GGUF/repo?FilePath="
         private const val HF_URL = "https://huggingface.co/AngelSlim/Hy-MT1.5-1.8B-1.25bit-GGUF/resolve/main/"
     }
@@ -37,9 +36,8 @@ class HyMTEngine(private val context: Context) {
     private var isReady = false
 
     private val modelFile: File get() = File(context.filesDir, "$MODEL_DIR/$MODEL_FILE")
-    private val tokenizerFile: File get() = File(context.filesDir, "$MODEL_DIR/$TOKENIZER_FILE")
 
-    fun isModelDownloaded(): Boolean = modelFile.exists() && tokenizerFile.exists()
+    fun isModelDownloaded(): Boolean = modelFile.exists() && modelFile.length() > 10_000_000
 
     suspend fun downloadModel(onProgress: (DownloadState) -> Unit) = withContext(Dispatchers.IO) {
         onProgress(DownloadState.Checking)
@@ -48,8 +46,6 @@ class HyMTEngine(private val context: Context) {
             var ok = tryDl(MS_URL + MODEL_FILE, modelFile, onProgress)
             if (!ok) ok = tryDl(HF_URL + MODEL_FILE, modelFile, onProgress)
             if (!ok) throw Exception("download failed")
-            tryDl(MS_URL + TOKENIZER_FILE, tokenizerFile) {}
-            tryDl(HF_URL + TOKENIZER_FILE, tokenizerFile) {}
             if (modelFile.exists() && modelFile.length() > 10_000_000)
                 onProgress(DownloadState.Complete)
             else onProgress(DownloadState.Error("file incomplete"))
@@ -58,23 +54,21 @@ class HyMTEngine(private val context: Context) {
         }
     }
 
-    /** Initialize model — call after download is complete */
     suspend fun initialize(): Boolean = withContext(Dispatchers.IO) {
         mutex.withLock {
             if (isReady) return@withContext true
             try {
                 if (!isModelDownloaded()) return@withContext false
-                val params = LlamaParams(nCtx = 2048, nBatch = 512, nThreads = 4, useMmap = true, useMlock = false)
-                model = LlamaModel(modelFile.absolutePath, tokenizerFile.absolutePath, params)
+                model = LlamaModel.load(modelFile.absolutePath) {
+                    contextSize = 2048
+                    threads = 4
+                    temperature = 0.0f
+                }
                 isReady = true; Log.i(TAG, "Model loaded"); true
             } catch (e: Exception) { Log.e(TAG, "Model load failed", e); false }
         }
     }
 
-    /**
-     * Translate text using the prompt format:
-     * "translate {sourceLang} to {targetLang}: {text}"
-     */
     suspend fun translate(
         text: String,
         sourceLang: Language,
@@ -83,11 +77,13 @@ class HyMTEngine(private val context: Context) {
         if (!isReady) throw IllegalStateException("Model not initialized")
 
         val prompt = "translate ${sourceLang.hyCode} to ${targetLang.hyCode}: $text"
-        val result = model!!.generate(prompt, maxTokens = text.length * 2 + 64)
-        result.trim()
+        val flow = model!!.generateStream(prompt, maxTokens = text.length * 2 + 64)
+        // Collect all tokens and join
+        val sb = StringBuilder()
+        flow.collect { token -> sb.append(token) }
+        sb.toString().trim()
     }
 
-    /** Batch translate a list of texts */
     suspend fun translateBatch(
         texts: List<String>,
         sourceLang: Language,

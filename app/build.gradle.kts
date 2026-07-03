@@ -56,7 +56,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // llama.cpp Android wrapper for HY-MT model
-    implementation("com.github.ggerganov:llama.cpp-android:android-2025-q4")
+    implementation("org.codeshipping:llama-kotlin-android:0.1.7")
 
     // File parsing
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
