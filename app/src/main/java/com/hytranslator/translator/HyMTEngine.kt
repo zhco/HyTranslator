@@ -77,7 +77,7 @@ class HyMTEngine(private val context: Context) {
         if (!isReady) throw IllegalStateException("Model not initialized")
 
         val prompt = "translate ${sourceLang.hyCode} to ${targetLang.hyCode}: $text"
-        val flow = model!!.generateStream(prompt, maxTokens = text.length * 2 + 64)
+        val flow = model!!.generateStream(prompt)
         // Collect all tokens and join
         val sb = StringBuilder()
         flow.collect { token -> sb.append(token) }
