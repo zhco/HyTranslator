@@ -161,9 +161,7 @@ fun FileTranslateScreen(
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text("翻译结果：", style = MaterialTheme.typography.labelMedium)
                         Spacer(Modifier.height(4.dp))
-                        SelectionContainer {
-                            Text(state.translatedText)
-                        }
+                        Text(state.translatedText)
                     }
                 }
             }
