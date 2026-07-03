@@ -7,8 +7,6 @@ import org.apache.poi.xwpf.extractor.XWPFWordExtractor
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.apache.poi.hwpf.extractor.WordExtractor
-import org.apache.poi.hwpf.HWPFDocument
 import org.apache.poi.hssf.extractor.ExcelExtractor
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import java.io.InputStream
@@ -23,8 +21,7 @@ class DocumentExtractor {
         return when {
             mimeType?.contains("pdf") == true -> extractPdf(inputStream)
             mimeType?.contains("wordprocessingml") == true -> extractDocx(inputStream)
-            mimeType?.contains("msword") == true -> extractDoc(inputStream)
-            mimeType?.contains("spreadsheetml") == true -> extractXlsx(inputStream)
+                        mimeType?.contains("spreadsheetml") == true -> extractXlsx(inputStream)
             mimeType?.contains("excel") == true -> extractXls(inputStream)
             mimeType?.contains("presentationml") == true -> extractPptx(inputStream)
             else -> extractPlainText(inputStream)
@@ -35,7 +32,7 @@ class DocumentExtractor {
         return try {
             val document = PDDocument.load(inputStream)
             val stripper = PDFTextStripper()
-            stripper.text
+            stripper.getText(document)
         } catch (e: Exception) {
             "Failed to extract PDF text: ${e.message}"
         }
@@ -52,13 +49,7 @@ class DocumentExtractor {
     }
 
     private fun extractDoc(inputStream: InputStream): String {
-        return try {
-            val doc = HWPFDocument(inputStream)
-            val extractor = WordExtractor(doc)
-            extractor.text
-        } catch (e: Exception) {
-            "Failed to extract DOC text: ${e.message}"
-        }
+        return "Old .doc format requires additional POI libraries."
     }
 
     private fun extractXlsx(inputStream: InputStream): String {
