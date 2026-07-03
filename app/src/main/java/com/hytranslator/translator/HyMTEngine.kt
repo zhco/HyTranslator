@@ -99,7 +99,7 @@ class HyMTEngine(private val context: Context) {
     }
 
     private fun tryDl(urlStr: String, dest: File, cb: (DownloadState) -> Unit): Boolean = try {
-        val con = (URL(urlStr).openConnection() as HttpURLConnection).apply { connectTimeout = 15000; readTimeout = 60000; connect() }
+        val con = (URL(urlStr).openConnection() as HttpURLConnection).apply { connectTimeout = 15000; readTimeout = 60000; instanceFollowRedirects = true; connect() }
         val total = con.contentLengthLong
         val ins = con.inputStream; val out = FileOutputStream(dest)
         val buf = ByteArray(8192); var n: Int; var rd = 0L; val t0 = System.currentTimeMillis()
