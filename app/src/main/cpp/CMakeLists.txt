@@ -3,23 +3,22 @@ project("hy-mt-stq")
 
 set(LLAMA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/llama.cpp)
 
-file(GLOB LLAMA_SRCS
-    ${LLAMA_DIR}/ggml.c
-    ${LLAMA_DIR}/ggml-alloc.c
-    ${LLAMA_DIR}/ggml-backend.c
-    ${LLAMA_DIR}/ggml-quants.c
-    ${LLAMA_DIR}/ggml-quants-stq.c
-    ${LLAMA_DIR}/llama.cpp
-    ${LLAMA_DIR}/unicode.cpp
-    ${LLAMA_DIR}/unicode-data.cpp
-)
+# Build llama.cpp as static lib via its own CMake
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_SERVER OFF CACHE BOOL "" FORCE)
+set(GGML_CPU_ALL_VARIANTS OFF CACHE BOOL "" FORCE)
+set(GGML_USE_STQ ON CACHE BOOL "Enable STQ quantization" FORCE)
 
-add_library(hy-mt-stq SHARED
-    hy-mt-jni.cpp
-    ${LLAMA_SRCS}
-)
+add_subdirectory(${LLAMA_DIR} ${CMAKE_CURRENT_BINARY_DIR}/llama_build)
 
-target_include_directories(hy-mt-stq PRIVATE ${LLAMA_DIR})
+add_library(hy-mt-stq SHARED hy-mt-jni.cpp)
+target_include_directories(hy-mt-stq PRIVATE
+    ${LLAMA_DIR}/include
+    ${LLAMA_DIR}/ggml/include
+    ${LLAMA_DIR}/common
+)
 target_compile_definitions(hy-mt-stq PRIVATE GGML_USE_STQ=1)
 find_library(log-lib log)
-target_link_libraries(hy-mt-stq ${log-lib})
+target_link_libraries(hy-mt-stq llama ${log-lib})
