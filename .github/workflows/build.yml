@@ -11,12 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Checkout llama.cpp with STQ kernel
-        uses: actions/checkout@v4
-        with:
-          repository: HaiShaw/llama.cpp
-          ref: hy-sherry-v3.1
-          path: app/src/main/cpp/llama.cpp
+      - name: Checkout llama.cpp with STQ kernel (PR #22836)
+        run: |
+          git clone --depth=1 https://github.com/ggml-org/llama.cpp.git app/src/main/cpp/llama.cpp
+          cd app/src/main/cpp/llama.cpp
+          git fetch origin pull/22836/head:stq
+          git checkout stq
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
